@@ -1,5 +1,6 @@
-from masks import get_mask_account, get_mask_card_number
 from datetime import datetime
+
+from masks import get_mask_account, get_mask_card_number
 
 
 def mask_account_card(incoming_string: str) -> str:
@@ -28,12 +29,11 @@ def get_date(date_string: str) -> str:
     if not date_string:
         return ""
 
-    if 'T' in date_string:
-        date_string = date_string.split('T')[0]
+    if "T" in date_string:
+        date_string = date_string.split("T")[0]
 
     try:
         dt = datetime.strptime(date_string, "%Y-%m-%d")
         return dt.strftime("%d.%m.%Y")
     except ValueError:
         return ""
-

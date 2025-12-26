@@ -1,7 +1,5 @@
 import sys
 import os
-import io
-from contextlib import redirect_stdout
 from datetime import datetime
 
 # Добавляем путь к исходным файлам
