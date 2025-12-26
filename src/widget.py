@@ -1,5 +1,5 @@
 from masks import get_mask_account, get_mask_card_number
-
+from datetime import datetime
 def mask_account_card(incoming_string: str) -> str:
     """" Функция обрабатывает информацию о картах и счетах"""
     output_string = ""
@@ -11,4 +11,10 @@ def mask_account_card(incoming_string: str) -> str:
         output_string = f"{incoming_string[0]} {get_mask_account(incoming_string[-1])}"
     return output_string
 
+
+def get_date(date_string: str) -> str:
+    """    Преобразует строку с датой в формате ISO 8601 в строку в формате "ДД.ММ.ГГГГ"""
+    if date_string != "":
+     dt = datetime.fromisoformat(date_string)
+    print(dt.strftime("%d.%m.%Y"))
 
