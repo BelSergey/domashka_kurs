@@ -379,31 +379,31 @@ def test_integration() -> None:
     """Интеграционные тесты для всех модулей."""
     logger.start_test_suite("ИНТЕГРАЦИОННЫЕ ТЕСТЫ")
 
-    # Создаем комплексные тестовые данные
+    # Создаем комплексные тестовые данные с использованием sender и recipient вместо from и to
     operations = [
         {
             "id": 41428829,
             "state": "EXECUTED",
             "date": "2019-07-03T18:35:29.512364",
             "description": "Перевод организации",
-            "from": "Visa Platinum 7000792289606361",
-            "to": "Счет 73654108430135874305"
+            "sender": "Visa Platinum 7000792289606361",
+            "recipient": "Счет 73654108430135874305"
         },
         {
             "id": 939719570,
             "state": "EXECUTED",
             "date": "2018-06-30T02:08:58.425572",
             "description": "Перевод организации",
-            "from": "Счет 75106830613657916952",
-            "to": "Счет 11776614605963066702"
+            "sender": "Счет 75106830613657916952",
+            "recipient": "Счет 11776614605963066702"
         },
         {
             "id": 594226727,
             "state": "CANCELED",
             "date": "2018-09-12T21:27:25.241689",
             "description": "Перевод организации",
-            "from": "Visa Platinum 1246377376343588",
-            "to": "Счет 14211924144426031657"
+            "sender": "Visa Platinum 1246377376343588",
+            "recipient": "Счет 14211924144426031657"
         },
     ]
 
@@ -426,8 +426,8 @@ def test_integration() -> None:
         formatted_op = {
             "date": get_date(op["date"]),
             "description": op["description"],
-            "from": mask_account_card(op["from"]),
-            "to": mask_account_card(op["to"]),
+            "sender": mask_account_card(op["sender"]),
+            "recipient": mask_account_card(op["recipient"]),
         }
         formatted_operations.append(formatted_op)
 
@@ -440,8 +440,8 @@ def test_integration() -> None:
         example = formatted_operations[0]
         print(f"  Дата: {example['date']}")
         print(f"  Описание: {example['description']}")
-        print(f"  Отправитель: {example['from']}")
-        print(f"  Получатель: {example['to']}")
+        print(f"  Отправитель: {example['sender']}")
+        print(f"  Получатель: {example['recipient']}")
 
     print("\n✅ Все интеграционные тесты пройдены")
 
