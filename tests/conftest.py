@@ -111,7 +111,7 @@ def operations_for_sorting():
     ("CANCELED", [2]),
     ("PENDING", [4]),
     ("NONEXISTENT", []),
-    ("executed", []),
+    ("executed", [8]),
     ("", []),
 ])
 def state_and_expected_ids(request):
