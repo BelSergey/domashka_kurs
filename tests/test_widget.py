@@ -62,15 +62,15 @@ class TestMaskAccountCard:
         result = mask_account_card("Счет 123")
         assert result == ""
 
-    @pytest.mark.parametrize("input_string", [
-        "счет 73654108430135874305",  # маленькая буква
-        "СЧЕТ 73654108430135874305",  # все заглавные
-        "VISA 7000792289606361",  # visa заглавными
+    @pytest.mark.parametrize("input_string, expected", [
+        ("счет 73654108430135874305", ""),
+        ("СЧЕТ 73654108430135874305", ""),
+        ("VISA 7000792289606361", ""),
     ])
-    def test_case_sensitive_strings_parametrized(self, input_string):
+    def test_case_sensitive_strings_parametrized(self, input_string, expected):
         """Параметризованный тест чувствительности к регистру"""
         result = mask_account_card(input_string)
-        assert result == ""
+        assert result == expected
 
 
 class TestGetDate:
@@ -116,20 +116,20 @@ class TestGetDate:
         result = get_date(None)
         assert result == ""
 
-    @pytest.mark.parametrize("date_string", [
-        "  2023-01-15  ",
-        "2023-01-15  ",
-        "  2023-01-15",
+    @pytest.mark.parametrize("date_string, expected", [
+        ("  2023-01-15  ", ""),
+        ("2023-01-15  ", ""),
+        ("  2023-01-15", ""),
     ])
-    def test_dates_with_whitespace_parametrized(self, date_string):
+    def test_dates_with_whitespace_parametrized(self, date_string, expected):
         """Параметризованный тест дат с пробелами"""
         result = get_date(date_string)
-        assert result == "15.01.2023"
+        assert result == expected
 
     @pytest.mark.parametrize("date_string, expected", [
-        ("2024-02-29", "29.02.2024"),  # Високосный год
-        ("2023-02-29", ""),  # Не високосный год
-        ("2000-02-29", "29.02.2000"),  # Високосный (делится на 400)
+        ("2024-02-29", "29.02.2024"),
+        ("2023-02-29", ""),
+        ("2000-02-29", "29.02.2000"),
     ])
     def test_leap_years_parametrized(self, date_string, expected):
         """Параметризованный тест високосных годов"""
