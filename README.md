@@ -11,7 +11,26 @@
 ## Установка с помощью Poetry:
 
 
-
+project/
+├── img.png
+├── pyproject.toml
+├── poetry.lock
+├── README.md
+├── .flake8
+├── .gitignore
+├── src/
+├   ├── __init__.py        
+├   ├── generators.py       
+├   ├── main.py           
+├   ├── masks.py           
+├   ├── processing.py     
+├   └── widget.py      
+├── tests/
+├   ├── __init__.py        
+├   ├── test_generators.py       
+├   ├── test_masks.py           
+├   ├── test_processing.py     
+├   └── test_widget.py      
 1. Клонируйте репозиторий:
 ```
 git clone git@github.com:BelSergey/domashka_kurs.git
@@ -31,87 +50,49 @@ poetry shell
 ## masks.py
 Содержит:
 
--  функцию  для маскировки банковских карт get_mask_card_number (card_number: str) -> str
-Маскирует номер банковской карты. Формат: XXXX XX** **** XXXX. Видны первые 6 цифр и последние 4 цифры, остальные заменены на *.
-
-    Принимает: 
-
-    card_number (str): Номер карты (16 цифр)
-
-    Возвращает: 
-
-    str: Маскированный номер карты
-
-- функции для маскировки банковских счетов get_mask_account(account_number: str) -> str
-Маскирует номер банковского счета. Формат: **XXXX. Видны только последние 4 цифры, перед ними две звездочки.
-
-    Принимает: 
-
-    account_number (str): Номер счета (минимум 4 цифры)
-
-    Возвращает: 
-
-    str: Маскированный номер счета
+- функцию для маскировки банковских карт `get_mask_card_number(card_number: str) -> str`
+- функцию для маскировки банковских счетов `get_mask_account(account_number: str) -> str`
 
 ## widget.py
 Содержит:
 
-- функцию mask_account_card(incoming_string: str) -> str,
-    которая маскирует номера банковских карт и счетов, используя модуль masks.py 
+- функцию `mask_account_card(incoming_string: str) -> str`, которая маскирует номера карт и счетов
+- функцию `get_date(date_string: str) -> str`, которая форматирует дату
 
-    Принимает: 
-
-    incoming_string (str): Строка с типом и номером карты/счета
-    
-    Возвращает: 
-
-    str: Маскированный номер карты/счета с указанием типа, или пустую строку в случае ошибки
-    
-    Обрабатывает карты Visa, MasterCard, Maestro и банковские счета
-- функцию get_date(date_string: str) -> str,
-
-    преобразует строку с датой в формате ISO 8601 в строку в формате "ДД.ММ.ГГГГ".
-
-    Принимает:  
-
-    date_string (str): Строка с датой в формате ISO 8601
-
-    Возвращает: 
-
-    str: Отформатированная дата или оригинальную строку в случае ошибки
- ## processing.py
+## processing.py
 Содержит:
 
-Функции для работы со списками операций.
+- функцию `filter_by_state(operations: List[Dict], state: str = "EXECUTED") -> List[Dict]`
+- функцию `sort_by_date(operations: List[Dict], reverse: bool = True) -> List[Dict]`
 
-- функцию filter_by_state(operations: List[Dict], state: str = "EXECUTED") -> List[Dict],
+## generators.py
+Содержит:
 
-    которая фильтрует список операций по статусу выполнения.
+- функцию `filter_by_currency(transactions: List[Dict], currency_code: str) -> Iterator[Dict]`,
+  которая возвращает итератор по транзакциям с заданной валютой.
+- генератор transaction_descriptions(transactions: List[Dict]) -> Iterator[str]
+, который возвращает описания транзакций по очереди.
+- генератор card_number_generator(start: int, end: int) -> Iterator[str]
+, который генерирует номера карт в формате "XXXX XXXX XXXX XXXX" в заданном диапазоне.
+## Тестирование:
 
-    Принимает: 
-    
-    operations (List[Dict]): Список словарей с операциями
-    
-    state (str, optional): Статус для фильтрации. По умолчанию "EXECUTED"
-
-    Возвращает:
-
-    List[Dict]: Отфильтрованный список операций
-- функцию sort_by_date(operations: List[Dict], reverse: bool = True) -> List[Dict],
-
-    которая сортирует список операций по дате.
-
-    Принимает:
-
-    operations (List[Dict]): Список словарей с операциями
-
-    reverse (bool, optional): Порядок сортировки. По умолчанию True (по убыванию, от новых к старым)
-
-    Возвращает:
-
-    List[Dict]: Отсортированный список операций
+Установите `pytest` и `pytest-cov`:
+```
+poetry add pytest pytest-cov
+````
+Для запуска тестирования с проверкой покрытия выполните команду:
+```
+poetry run pytest tests/ -v --cov=src
+```
+Для запуска тестирования без проверки покрытия выполните команду:
+```
+poetry run pytest tests/
+```
 ## Документация:
 
  [Документация](https://github.com/BelSergey/domashka_kurs/blob/master/README.md).
 ## тесты:
- [Результаты тестирования](https://github.com/BelSergey/domashka_kurs/blob/master/tests/test_results.txt).
+Для запуска тестов выполните:
+```
+pytest --cov=generators --cov-report=term-missing
+```
