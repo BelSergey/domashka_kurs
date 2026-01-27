@@ -2,6 +2,7 @@
 Общие фикстуры для тестов
 """
 import pytest
+from typing import List, Dict, Any
 
 
 # Фикстуры для масок карт
@@ -280,4 +281,92 @@ def edge_case_operations():
         {"from": "Visa 1234567812345678"},
         {"to": "Счет 12345678901234567890"},
         {},
+    ]
+
+@pytest.fixture
+def sample_transactions() -> List[Dict[str, Any]]:
+    """Фикстура с примером транзакций."""
+    return [
+        {
+            "id": 939719570,
+            "state": "EXECUTED",
+            "date": "2018-06-30T02:08:58.425572",
+            "operationAmount": {
+                "amount": "9824.07",
+                "currency": {"name": "USD", "code": "USD"},
+            },
+            "description": "Перевод организации",
+            "from": "Счет 75106830613657916952",
+            "to": "Счет 11776614605963066702",
+        },
+        {
+            "id": 142264268,
+            "state": "EXECUTED",
+            "date": "2019-04-04T23:20:05.206878",
+            "operationAmount": {
+                "amount": "79114.93",
+                "currency": {"name": "RUB", "code": "RUB"},
+            },
+            "description": "Перевод со счета на счет",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188",
+        },
+        {
+            "id": 873106923,
+            "state": "EXECUTED",
+            "date": "2019-03-23T01:09:46.296404",
+            "operationAmount": {
+                "amount": "43318.34",
+                "currency": {"name": "USD", "code": "USD"},
+            },
+            "description": "Перевод со счета на счет",
+            "from": "Счет 44812258784861134719",
+            "to": "Счет 74489636417521191160",
+        },
+        {
+            "id": 895315941,
+            "state": "CANCELED",
+            "date": "2018-08-19T04:27:37.904916",
+            "operationAmount": {
+                "amount": "56883.54",
+                "currency": {"name": "USD", "code": "USD"},
+            },
+            "description": "Перевод с карты на карту",
+            "from": "Visa Classic 6831982476737658",
+            "to": "Visa Platinum 8990922113665229",
+        },
+        {
+            "id": 596171168,
+            "state": "EXECUTED",
+            "date": "2018-07-11T02:26:18.671407",
+            "operationAmount": {
+                "amount": "79931.03",
+                "currency": {"name": "руб.", "code": "RUB"},
+            },
+            "description": "Открытие вклада",
+            "to": "Счет 72082042523231456215",
+        },
+    ]
+
+
+@pytest.fixture
+def empty_transactions() -> List[Dict[str, Any]]:
+    """Фикстура с пустым списком транзакций."""
+    return []
+
+
+@pytest.fixture
+def single_transaction() -> List[Dict[str, Any]]:
+    """Фикстура с одной транзакцией."""
+    return [
+        {
+            "id": 1,
+            "state": "EXECUTED",
+            "date": "2024-01-01T00:00:00.000000",
+            "operationAmount": {
+                "amount": "1000.00",
+                "currency": {"name": "EUR", "code": "EUR"},
+            },
+            "description": "Тестовая транзакция",
+        }
     ]
