@@ -54,7 +54,6 @@ class TestMaskAccountCard:
         result = mask_account_card(input_string)
         assert result == expected
 
-
     def test_card_with_invalid_number(self):
         """Тест карты с некорректным номером"""
         result = mask_account_card("Visa 123")
@@ -119,7 +118,6 @@ class TestGetDate:
         """Параметризованный тест граничных значений месяцев"""
         result = get_date(date_string)
         assert result == expected
-
 
     @pytest.mark.parametrize(
         "date_string, expected",
