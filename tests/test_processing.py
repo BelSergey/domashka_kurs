@@ -1,4 +1,5 @@
 import pytest
+
 from src.processing import filter_by_state, sort_by_date
 
 
@@ -22,12 +23,15 @@ class TestFilterByState:
         result = filter_by_state([], "EXECUTED")
         assert result == []
 
-    @pytest.mark.parametrize("state, expected_count", [
-        ("EXECUTED", 3),
-        ("CANCELED", 1),
-        ("PENDING", 1),
-        ("NONEXISTENT", 0),
-    ])
+    @pytest.mark.parametrize(
+        "state, expected_count",
+        [
+            ("EXECUTED", 3),
+            ("CANCELED", 1),
+            ("PENDING", 1),
+            ("NONEXISTENT", 0),
+        ],
+    )
     def test_filter_counts_parametrized(self, sample_operations, state, expected_count):
         """Параметризованный тест количества отфильтрованных операций"""
         result = filter_by_state(sample_operations, state)
@@ -42,8 +46,7 @@ class TestFilterByState:
 
     def test_filter_large_dataset(self):
         """Тест фильтрации большого набора данных"""
-        operations = [{"id": i, "state": "EXECUTED" if i % 2 == 0 else "CANCELED"}
-                      for i in range(1000)]
+        operations = [{"id": i, "state": "EXECUTED" if i % 2 == 0 else "CANCELED"} for i in range(1000)]
         result = filter_by_state(operations, "EXECUTED")
         assert len(result) == 500
         assert all(op["state"] == "EXECUTED" for op in result)
@@ -74,10 +77,13 @@ class TestSortByDate:
         assert len(result) == 1
         assert result[0]["id"] == 1
 
-    @pytest.mark.parametrize("reverse, expected_order", [
-        (True, [2, 3, 6, 7, 1, 4]),  # По убыванию
-        (False, [4, 1, 7, 6, 3, 2]),  # По возрастанию
-    ])
+    @pytest.mark.parametrize(
+        "reverse, expected_order",
+        [
+            (True, [2, 3, 6, 7, 1, 4]),  # По убыванию
+            (False, [4, 1, 7, 6, 3, 2]),  # По возрастанию
+        ],
+    )
     def test_sort_order_parametrized(self, operations_for_sorting, reverse, expected_order):
         """Параметризованный тест порядка сортировки"""
         result = sort_by_date(operations_for_sorting, reverse=reverse)
@@ -92,10 +98,13 @@ class TestSortByDate:
         result.append({"id": 999, "date": "2023-01-01"})
         assert len(operations_for_sorting) == 7
 
-    @pytest.mark.parametrize("operations, expected_ids", [
-        ([{"id": 1, "date": "2023-01-01"}, {"id": 2, "date": "2023-01-02"}], [2, 1]),
-        ([{"id": 1, "date": "2022-12-31"}, {"id": 2, "date": "2023-01-01"}], [2, 1]),
-    ])
+    @pytest.mark.parametrize(
+        "operations, expected_ids",
+        [
+            ([{"id": 1, "date": "2023-01-01"}, {"id": 2, "date": "2023-01-02"}], [2, 1]),
+            ([{"id": 1, "date": "2022-12-31"}, {"id": 2, "date": "2023-01-01"}], [2, 1]),
+        ],
+    )
     def test_specific_sorting_cases_parametrized(self, operations, expected_ids):
         """Параметризованные тесты конкретных случаев сортировки"""
         result = sort_by_date(operations, reverse=True)

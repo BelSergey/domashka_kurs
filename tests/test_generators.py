@@ -1,6 +1,6 @@
-
 import pytest
-from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
+
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 
 
 class TestFilterByCurrency:
@@ -16,25 +16,21 @@ class TestFilterByCurrency:
         ],
     )
     def test_filter_by_currency(
-            self,
-            sample_transactions,
-            currency_code,
-            expected_count,
-            expected_ids,
+        self,
+        sample_transactions,
+        currency_code,
+        expected_count,
+        expected_ids,
     ):
         """Параметризованный тест фильтрации по валюте."""
-        filtered_transactions = list(
-            filter_by_currency(sample_transactions, currency_code)
-        )
+        filtered_transactions = list(filter_by_currency(sample_transactions, currency_code))
 
         assert len(filtered_transactions) == expected_count
         assert [t["id"] for t in filtered_transactions] == expected_ids
 
         # Проверяем, что у всех отфильтрованных транзакций правильная валюта
         for transaction in filtered_transactions:
-            assert (
-                    transaction["operationAmount"]["currency"]["code"] == currency_code
-            )
+            assert transaction["operationAmount"]["currency"]["code"] == currency_code
 
     def test_filter_by_currency_empty_list(self, empty_transactions):
         """Тест фильтрации пустого списка транзакций."""
@@ -72,9 +68,7 @@ class TestTransactionDescriptions:
             (4, "Открытие вклада"),
         ],
     )
-    def test_transaction_descriptions(
-            self, sample_transactions, index, expected_description
-    ):
+    def test_transaction_descriptions(self, sample_transactions, index, expected_description):
         """Параметризованный тест генератора описаний транзакций."""
         generator = transaction_descriptions(sample_transactions)
 
@@ -112,30 +106,14 @@ class TestCardNumberGenerator:
     @pytest.mark.parametrize(
         "start, end, expected_results",
         [
+            (1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002", "0000 0000 0000 0003"]),
             (
-                    1,
-                    3,
-                    [
-                        "0000 0000 0000 0001",
-                        "0000 0000 0000 0002",
-                        "0000 0000 0000 0003",
-                    ],
-            ),
-            (
-                    9999999999999997,
-                    9999999999999999,
-                    [
-                        "9999 9999 9999 9997",
-                        "9999 9999 9999 9998",
-                        "9999 9999 9999 9999",
-                    ],
+                9999999999999997,
+                9999999999999999,
+                ["9999 9999 9999 9997", "9999 9999 9999 9998", "9999 9999 9999 9999"],
             ),
             (0, 0, ["0000 0000 0000 0000"]),
-            (
-                    1234567890123456,
-                    1234567890123456,
-                    ["1234 5678 9012 3456"],
-            ),
+            (1234567890123456, 1234567890123456, ["1234 5678 9012 3456"]),
         ],
     )
     def test_card_number_generator_normal_cases(self, start, end, expected_results):

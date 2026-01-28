@@ -1,5 +1,6 @@
 import pytest
-from src.masks import get_mask_card_number, get_mask_account
+
+from src.masks import get_mask_account, get_mask_card_number
 
 
 class TestGetMaskCardNumber:
@@ -24,19 +25,25 @@ class TestGetMaskCardNumber:
             get_mask_card_number(card_number)
         assert "16 цифр" in str(exc_info.value)
 
-    @pytest.mark.parametrize("card_number, expected", [
-        ("1111222233334444", "1111 22** **** 4444"),
-        ("5555666677778888", "5555 66** **** 8888"),
-    ])
+    @pytest.mark.parametrize(
+        "card_number, expected",
+        [
+            ("1111222233334444", "1111 22** **** 4444"),
+            ("5555666677778888", "5555 66** **** 8888"),
+        ],
+    )
     def test_additional_valid_card_numbers_parametrized(self, card_number, expected):
         """Дополнительные параметризованные тесты валидных номеров карт"""
         result = get_mask_card_number(card_number)
         assert result == expected
 
-    @pytest.mark.parametrize("card_number, error_message", [
-        ("", "Номер карты должен содержать 16 цифр, получено 0"),
-        ("123", "Номер карты должен содержать 16 цифр, получено 3"),
-    ])
+    @pytest.mark.parametrize(
+        "card_number, error_message",
+        [
+            ("", "Номер карты должен содержать 16 цифр, получено 0"),
+            ("123", "Номер карты должен содержать 16 цифр, получено 3"),
+        ],
+    )
     def test_additional_invalid_card_numbers_parametrized(self, card_number, error_message):
         """Дополнительные параметризованные тесты невалидных номеров карт"""
         with pytest.raises(ValueError, match=error_message):
@@ -71,19 +78,25 @@ class TestGetMaskAccount:
             get_mask_account(account_number)
         assert "минимум 4 цифры" in str(exc_info.value)
 
-    @pytest.mark.parametrize("account_number, expected", [
-        ("11112222333344445555", "**5555"),
-        ("99998888777766665544", "**5544"),
-    ])
+    @pytest.mark.parametrize(
+        "account_number, expected",
+        [
+            ("11112222333344445555", "**5555"),
+            ("99998888777766665544", "**5544"),
+        ],
+    )
     def test_additional_valid_account_numbers_parametrized(self, account_number, expected):
         """Дополнительные параметризованные тесты валидных номеров счетов"""
         result = get_mask_account(account_number)
         assert result == expected
 
-    @pytest.mark.parametrize("account_number, error_message", [
-        ("", "Номер счета должен содержать минимум 4 цифры, получено 0"),
-        ("12", "Номер счета должен содержать минимум 4 цифры, получено 2"),
-    ])
+    @pytest.mark.parametrize(
+        "account_number, error_message",
+        [
+            ("", "Номер счета должен содержать минимум 4 цифры, получено 0"),
+            ("12", "Номер счета должен содержать минимум 4 цифры, получено 2"),
+        ],
+    )
     def test_additional_invalid_account_numbers_parametrized(self, account_number, error_message):
         """Дополнительные параметризованные тесты невалидных номеров счетов"""
         with pytest.raises(ValueError, match=error_message):
