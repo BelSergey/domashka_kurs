@@ -89,7 +89,13 @@ poetry shell
   , который возвращает описания транзакций по очереди.
 - генератор card_number_generator(start: int, end: int) -> Iterator[str]
   , который генерирует номера карт в формате "XXXX XXXX XXXX XXXX" в заданном диапазоне.
+## decorators.py
 
+Содержит:
+
+- декоратор `log(func: Optional[Callable] = None, filename: Optional[str] = None) -> Union[Callable, Callable[[Callable], Callable]]:для логирования вызовов функций
+- вспомогательную функцию write_log(message: str, filename: Optional[str] = None) -> None:,
+ которая записывает логи в файл или выводит в консоль
 ## Тестирование:
 
 Установите `pytest` и `pytest-cov`:

@@ -8,10 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 LOG_FILE = os.getenv("LOG_FILE_PATH")
 
-def log(func: Optional[Callable] = None, filename: Optional[str] = None) -> Union[Callable, Callable[[Callable], Callable]]:
+
+def log(
+    func: Optional[Callable] = None, filename: Optional[str] = None
+) -> Union[Callable, Callable[[Callable], Callable]]:
     def decorator(actual_func: Callable) -> Callable:
         @functools.wraps(actual_func)
-        def wrapper(*args, **kwargs) -> Any:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             if filename is not None:
                 log_file = filename
             elif LOG_FILE is not None:
@@ -27,11 +30,11 @@ def log(func: Optional[Callable] = None, filename: Optional[str] = None) -> Unio
             start_message = f"[{time_stamp}] Начало выполнения {func_name} ({signature})"
             write_log(start_message, log_file)
             try:
-                actual_func(*args, **kwargs)
+                result = actual_func(*args, **kwargs)
                 end_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 end_msg = f"[{end_timestamp}] Функция {func_name} успешно выполнена. "
                 write_log(end_msg, log_file)
-                return
+                return result
             except Exception as e:
                 error_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 error_message = (
@@ -55,4 +58,3 @@ def write_log(message: str, filename: Optional[str] = None) -> None:
             f.write(message + "\n")
     else:
         print(message)
-

@@ -2,12 +2,15 @@
 Общие фикстуры для тестов
 """
 
-from typing import Any, Dict, List
+import os
+import tempfile
+from typing import Any, Callable, Dict, Generator, List, Optional, Type
 
 import pytest
 
+from utils.simple_calculator import Calculator
 
-# Фикстуры для масок карт
+
 @pytest.fixture(
     params=[
         ("7000792289606361", "7000 79** **** 6361"),
@@ -405,3 +408,188 @@ def single_transaction() -> List[Dict[str, Any]]:
             "description": "Тестовая транзакция",
         }
     ]
+
+
+"""
+Фикстуры для тестирования модуля декораторов.
+Фикстуры автоматически доступны во всех тестовых файлах.
+"""
+
+
+@pytest.fixture
+def temp_file_path() -> Generator[str, None, None]:
+    """Создает временный файл с расширением .txt."""
+    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt", encoding="utf-8")
+    temp_file.close()
+    file_path = temp_file.name
+    yield file_path
+    if os.path.exists(file_path):
+        os.unlink(file_path)
+
+
+@pytest.fixture
+def temp_log_file() -> Generator[str, None, None]:
+    """Создает временный файл с расширением .log."""
+    temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".log", encoding="utf-8")
+    temp_file.close()
+    file_path = temp_file.name
+    yield file_path
+    if os.path.exists(file_path):
+        os.unlink(file_path)
+
+
+@pytest.fixture
+def temp_directory() -> Generator[str, None, None]:
+    """Создает временную директорию."""
+    temp_dir = tempfile.mkdtemp()
+    yield temp_dir
+    import shutil
+
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+
+
+@pytest.fixture
+def add_function() -> Callable[[int, int], int]:
+    """Возвращает функцию сложения двух чисел."""
+
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    return add
+
+
+@pytest.fixture
+def multiply_function() -> Callable[[int, int], int]:
+    """Возвращает функцию умножения двух чисел."""
+
+    def multiply(x: int, y: int) -> int:
+        return x * y
+
+    return multiply
+
+
+@pytest.fixture
+def divide_function() -> Callable[[int, int], float]:
+    """Возвращает функцию деления двух чисел."""
+
+    def divide(a: int, b: int) -> float:
+        return a / b
+
+    return divide
+
+
+@pytest.fixture
+def greet_function() -> Callable[[str, str], str]:
+    """Возвращает функцию приветствия."""
+
+    def greet(name: str, greeting: str = "Hello") -> str:
+        return f"{greeting}, {name}!"
+
+    return greet
+
+
+@pytest.fixture
+def calculator_class() -> Type[Calculator]:
+    """Возвращает класс калькулятора для тестирования."""
+    return Calculator
+
+
+@pytest.fixture
+def set_log_env_var(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
+    """Устанавливает переменную окружения LOG_FILE_PATH."""
+
+    def _set_env_var(file_path: str) -> None:
+        monkeypatch.setenv("LOG_FILE_PATH", file_path)
+
+    return _set_env_var
+
+
+@pytest.fixture
+def clear_log_env_var(monkeypatch: pytest.MonkeyPatch) -> Callable[[], None]:
+    """Удаляет переменную окружения LOG_FILE_PATH."""
+
+    def _clear_env_var() -> None:
+        monkeypatch.delenv("LOG_FILE_PATH", raising=False)
+
+    return _clear_env_var
+
+
+@pytest.fixture(
+    params=[
+        "Простое сообщение",
+        "Сообщение с числами 123",
+        "Сообщение с символами !@#$%",
+        "",
+        "Привет мир",
+    ]
+)
+def different_messages(request: pytest.FixtureRequest) -> str:
+    """Фикстура с различными тестовыми сообщениями."""
+    return request.param
+
+
+@pytest.fixture
+def function_that_fails() -> Callable[[], None]:
+    """Возвращает функцию, которая всегда вызывает ValueError."""
+
+    def failing_function() -> None:
+        raise ValueError("Тестовая ошибка!")
+
+    return failing_function
+
+
+@pytest.fixture
+def counter_function() -> Callable[[], int]:
+    """Возвращает функцию-счетчик вызовов."""
+    call_count = 0
+
+    def counter() -> int:
+        nonlocal call_count
+        call_count += 1
+        return call_count
+
+    return counter
+
+
+@pytest.fixture
+def capture_output(capsys: pytest.CaptureFixture[str]) -> Callable[[], str]:
+    """Захватывает вывод в stdout и stderr."""
+
+    def _capture() -> str:
+        captured = capsys.readouterr()
+        return captured.out + captured.err
+
+    return _capture
+
+
+@pytest.fixture
+def factorial_function() -> Callable[[int], int]:
+    """Возвращает рекурсивную функцию для вычисления факториала."""
+
+    def factorial(n: int) -> int:
+        if n <= 1:
+            return 1
+        return n * factorial(n - 1)
+
+    return factorial
+
+
+@pytest.fixture
+def create_decorated_function() -> Callable[..., Callable[..., Any]]:
+    """Создает декорированную функцию с заданными параметрами."""
+    from src.decorators import log
+
+    def _create(func: Optional[Callable[..., Any]] = None, filename: Optional[str] = None) -> Callable[..., Any]:
+        if func is None:
+
+            def default_func(a: int, b: int) -> int:
+                return a + b
+
+            func = default_func
+        if filename:
+            return log(filename=filename)(func)
+        else:
+            return log(func)
+
+    return _create
