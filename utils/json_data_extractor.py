@@ -17,7 +17,6 @@ def transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
             if not isinstance(transaction_data, list):
                 print(f"Данные в файле не являются списком. Тип данных: {type(transaction_data)}")
                 return []
-            print(transaction_data)
             return transaction_data
     except json.JSONDecodeError as e:
             print(f"Ошибка декодирования JSON в файле {file_path}: {e}")
