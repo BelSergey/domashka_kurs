@@ -9,8 +9,7 @@ load_dotenv()
 LOG_FILE = os.getenv("LOG_FILE_PATH")
 
 
-def log(
-    func: Optional[Callable] = None, filename: Optional[str] = None
+def log( func: Optional[Callable] = None, filename: Optional[str] = None
 ) -> Union[Callable, Callable[[Callable], Callable]]:
     def decorator(actual_func: Callable) -> Callable:
         @functools.wraps(actual_func)
