@@ -4,7 +4,14 @@ from typing import Any, Callable, Optional
 import pytest
 
 from src.decorators import log, write_log
-from utils.simple_calculator import Calculator
+from src.utils.simple_calculator import Calculator
+
+
+def _factorial(n: int) -> int:
+    """Рекурсивная функция факториала, определённая на уровне модуля."""
+    if n <= 1:
+        return 1
+    return n * _factorial(n - 1)
 
 
 def test_write_log_creates_file(temp_file_path: str) -> None:
@@ -192,8 +199,7 @@ def test_log_decorator_env_variable(
     set_log_env_var: Callable[[str], None],
     clear_log_env_var: Callable[[], None],
     temp_log_file: str,
-    capture_output: Callable[[], str],
-) -> None:
+    capture_output: Callable[[], str],) -> None:
     """Проверяет влияние переменной окружения LOG_FILE_PATH."""
     clear_log_env_var()
 
@@ -205,8 +211,11 @@ def test_log_decorator_env_variable(
     assert result == "test"
     output = capture_output()
     assert "test_func" in output
+
     set_log_env_var(temp_log_file)
-    assert result == "test"
+
+    result2 = test_func()
+    assert result2 == "test"
     assert os.path.exists(temp_log_file)
     with open(temp_log_file, "r", encoding="utf-8") as f:
         content = f.read()
@@ -214,14 +223,20 @@ def test_log_decorator_env_variable(
 
 
 @pytest.mark.slow
-def test_log_decorator_recursive(factorial_function: Callable[[int], int], temp_log_file: str) -> None:
+def test_log_decorator_recursive(temp_log_file: str) -> None:
     """Проверяет декоратор на рекурсивной функции."""
-    decorated_factorial = log(filename=temp_log_file)(factorial_function)
-    result = decorated_factorial(5)
-    assert result == 120
-    with open(temp_log_file, "r", encoding="utf-8") as f:
-        lines = [line for line in f if line.strip()]
-    assert len(lines) > 1
+    global _factorial
+    original_factorial = _factorial
+    try:
+        decorated = log(filename=temp_log_file)(_factorial)
+        _factorial = decorated
+        result = decorated(5)
+        assert result == 120
+        with open(temp_log_file, "r", encoding="utf-8") as f:
+            lines = [line for line in f if line.strip()]
+        assert len(lines) > 1
+    finally:
+        _factorial = original_factorial
 
 
 def test_create_decorated_function(

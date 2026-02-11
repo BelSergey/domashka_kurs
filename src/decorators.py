@@ -1,59 +1,53 @@
 import datetime
 import functools
 import os
-from typing import Any, Callable, Optional, Union
-
-from dotenv import load_dotenv
-
-load_dotenv()
-LOG_FILE = os.getenv("LOG_FILE_PATH")
+from typing import Any, Callable, Optional
 
 
-def log( func: Optional[Callable] = None, filename: Optional[str] = None
-) -> Union[Callable, Callable[[Callable], Callable]]:
-    def decorator(actual_func: Callable) -> Callable:
-        @functools.wraps(actual_func)
+def write_log(message: str, filename: Optional[str] = None) -> None:
+    """Запись лога в файл (если имя корректное) или в консоль."""
+    if filename and filename.strip():
+        dirname = os.path.dirname(filename.strip())
+        if dirname and not os.path.exists(dirname):
+            os.makedirs(dirname, exist_ok=True)
+        with open(filename.strip(), "a", encoding="utf-8") as f:
+            f.write(message + "\n")
+    else:
+        print(message)
+
+
+def log(filename: Optional[str] = None) -> Callable:
+    """Декоратор для логирования вызовов функций."""
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            if filename is not None:
-                log_file = filename
-            elif LOG_FILE is not None:
-                log_file = LOG_FILE
+            # Актуальный файл лога: приоритет у параметра, затем переменная окружения
+            log_file = filename if filename is not None else os.getenv("LOG_FILE_PATH")
 
-            time_stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            func_name = actual_func.__name__
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            func_name = func.__name__
 
             args_repr = [repr(a) for a in args]
             kwargs_repr = [f"{k}={repr(v)}" for k, v in kwargs.items()]
             signature = ",".join(args_repr + kwargs_repr)
 
-            start_message = f"[{time_stamp}] Начало выполнения {func_name} ({signature})"
-            write_log(start_message, log_file)
             try:
-                result = actual_func(*args, **kwargs)
+                result = func(*args, **kwargs)
                 end_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                end_msg = f"[{end_timestamp}] Функция {func_name} успешно выполнена. "
-                write_log(end_msg, log_file)
+                msg = (
+                    f"[{end_timestamp}] Функция {func_name} вызвана с аргументами ({signature}) -> "
+                    f"результат: {repr(result)}"
+                )
+                write_log(msg, log_file)
                 return result
             except Exception as e:
                 error_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                error_message = (
-                    f"[{error_timestamp}] Ошибка в функции {func_name}({signature}): {type(e).__name__}: {str(e)}"
+                error_msg = (
+                    f"[{error_timestamp}] Ошибка в функции {func_name}({signature}): "
+                    f"{type(e).__name__}: {e}"
                 )
-                write_log(error_message, log_file)
+                write_log(error_msg, log_file)
                 raise
 
         return wrapper
-
-    if func is None:
-        return decorator
-    else:
-        return decorator(func)
-
-
-def write_log(message: str, filename: Optional[str] = None) -> None:
-    """Функция для записи логов в файл или консоль"""
-    if filename:
-        with open(filename, "a", encoding="utf-8") as f:
-            f.write(message + "\n")
-    else:
-        print(message)
+    return decorator

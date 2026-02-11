@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, Generator, List, Optional, Type
 
 import pytest
 
-from utils.simple_calculator import Calculator
+from src.utils.simple_calculator import Calculator
 
 
 @pytest.fixture(
