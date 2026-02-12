@@ -199,7 +199,8 @@ def test_log_decorator_env_variable(
     set_log_env_var: Callable[[str], None],
     clear_log_env_var: Callable[[], None],
     temp_log_file: str,
-    capture_output: Callable[[], str],) -> None:
+    capture_output: Callable[[], str],
+) -> None:
     """Проверяет влияние переменной окружения LOG_FILE_PATH."""
     clear_log_env_var()
 

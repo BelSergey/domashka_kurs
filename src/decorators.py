@@ -18,6 +18,7 @@ def write_log(message: str, filename: Optional[str] = None) -> None:
 
 def log(filename: Optional[str] = None) -> Callable:
     """Декоратор для логирования вызовов функций."""
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -33,7 +34,7 @@ def log(filename: Optional[str] = None) -> Callable:
 
             try:
                 result = func(*args, **kwargs)
-                end_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                end_timestamp = timestamp
                 msg = (
                     f"[{end_timestamp}] Функция {func_name} вызвана с аргументами ({signature}) -> "
                     f"результат: {repr(result)}"
@@ -41,13 +42,13 @@ def log(filename: Optional[str] = None) -> Callable:
                 write_log(msg, log_file)
                 return result
             except Exception as e:
-                error_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                error_timestamp = timestamp
                 error_msg = (
-                    f"[{error_timestamp}] Ошибка в функции {func_name}({signature}): "
-                    f"{type(e).__name__}: {e}"
+                    f"[{error_timestamp}] Ошибка в функции {func_name}({signature}): " f"{type(e).__name__}: {e}"
                 )
                 write_log(error_msg, log_file)
                 raise
 
         return wrapper
+
     return decorator

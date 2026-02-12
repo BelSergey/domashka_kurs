@@ -590,6 +590,7 @@ def create_decorated_function() -> Callable[..., Callable[..., Any]]:
         if filename:
             return log(filename=filename)(func)
         else:
-            return log(func)
+            decorated = log(filename="log.txt")(func)
+            return decorated
 
     return _create

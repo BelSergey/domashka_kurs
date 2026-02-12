@@ -57,7 +57,16 @@ poetry shell
 ![img.png](img.png)
 
 # Описание модулей
+# src\utils
+## json_data_extractor 
 
+    Содержит:
+- функцию извлечения данных о транзакциях из json- файла transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
+
+## simple_calculator
+Содержит:
+- класс Calculator с функциями сложения, вычитания, умножения и деления целых чисел  
+# src/
 ## masks.py
 
 Содержит:
@@ -96,7 +105,13 @@ poetry shell
 - декоратор `log(func: Optional[Callable] = None, filename: Optional[str] = None) -> Union[Callable, Callable[[Callable], Callable]]:для логирования вызовов функций
 - вспомогательную функцию write_log(message: str, filename: Optional[str] = None) -> None:,
  которая записывает логи в файл или выводит в консоль
-## Тестирование:
+
+## external_api
+
+Содержит:
+
+- функцию конвертации суммы транзакции в рубли, используя Exchange Rates Data API, get_amount_in_rub(transaction: Dict) -> Optional[float]
+# Тестирование:
 
 Установите `pytest` и `pytest-cov`:
 

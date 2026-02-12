@@ -1,8 +1,9 @@
 import os
-import requests
 from typing import Dict, Optional
+
+import requests
 from dotenv import load_dotenv
-from requests.exceptions import RequestException, ConnectionError, Timeout
+from requests.exceptions import ConnectionError, RequestException, Timeout
 
 load_dotenv()
 
@@ -33,11 +34,17 @@ def get_amount_in_rub(transaction: Dict) -> Optional[float]:
             print("Ошибка: API ключ не найден. Проверьте файл .env")
             return None
 
-        url = "https://api.apilayer.com/exchangerates_data/convert"
-        headers = {"apikey": api_key}
-        params = {"from": currency, "to": "RUB", "amount": amount}
-
-        response = requests.get(url, headers=headers, params=params, timeout=10)
+        params: dict[str, str | float | int] = {
+            "from": currency,
+            "to": "RUB",
+            "amount": amount
+        }
+        response = requests.get(
+            "https://api.apilayer.com/exchangerates_data/convert",
+            headers={"apikey": api_key},
+            params=params,
+            timeout=10
+        )
         response.raise_for_status()
         data = response.json()
 
