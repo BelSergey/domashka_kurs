@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from masks import get_mask_account, get_mask_card_number
+from src.masks import get_mask_account, get_mask_card_number
 
 
 def mask_account_card(incoming_string: str) -> str:
     """Функция обрабатывает информацию о картах и счетах"""
     if not incoming_string:
         return ""
-
     parts = incoming_string.split(" ")
     if len(parts) < 2:
         return ""
@@ -15,11 +14,14 @@ def mask_account_card(incoming_string: str) -> str:
     card_name_parts = parts[:-1]
     number = parts[-1]
 
-    if parts[0] in ["Visa", "Maestro", "MasterCard"]:
-        card_name = " ".join(card_name_parts)
-        return f"{card_name} {get_mask_card_number(number)}"
-    elif parts[0] == "Счет":
-        return f"{parts[0]} {get_mask_account(number)}"
+    try:
+        if parts[0] in ["Visa", "Maestro", "MasterCard"]:
+            card_name = " ".join(card_name_parts)
+            return f"{card_name} {get_mask_card_number(number)}"
+        elif parts[0] == "Счет":
+            return f"{parts[0]} {get_mask_account(number)}"
+    except ValueError:
+        return ""
 
     return ""
 
