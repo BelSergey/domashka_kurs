@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOG_DIR = BASE_DIR / "logs"
-LOG_FILE = LOG_DIR / "utils.log"
+LOG_FILE = LOG_DIR / "json_data_extractor.log"
 
 os.makedirs(LOG_DIR, exist_ok=True)
 
