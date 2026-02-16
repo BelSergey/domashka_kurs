@@ -30,3 +30,4 @@ def transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
     except Exception as e:
         print(f"Неожиданная ошибка при чтении файла {file_path}: {e}")
         return []
+
