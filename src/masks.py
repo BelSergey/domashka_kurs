@@ -1,8 +1,7 @@
 import logging
 import os
 
-
-LOG_DIR = os.path.join( os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
+LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")
 LOG_FILE = os.path.join(LOG_DIR, "logs.log")
 
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -39,7 +38,7 @@ def get_mask_card_number(card_number: str) -> str:
         logger.debug(f"Результат маскирования: {masked_card}")
         return masked_card
 
-    except Exception as e:
+    except Exception:
         logger.exception("Ошибка при маскировании карты")
         raise
 
@@ -62,6 +61,6 @@ def get_mask_account(account_number: str) -> str:
         logger.debug(f"Результат маскирования счета: {masked_account}")
         return masked_account
 
-    except Exception as e:
+    except Exception:
         logger.exception("Ошибка при маскировании счета")
         raise

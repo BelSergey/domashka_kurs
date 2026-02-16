@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOG_DIR = BASE_DIR / "logs"
 LOG_FILE = LOG_DIR / "calculator.log"
@@ -36,7 +35,7 @@ class Calculator:
             result = a + b
             logger.debug(f"Результат add: {result}")
             return result
-        except Exception as e:
+        except Exception:
             logger.exception("Ошибка в методе add")
             raise
 
@@ -47,7 +46,7 @@ class Calculator:
             result = a - b
             logger.debug(f"Результат subtract: {result}")
             return result
-        except Exception as e:
+        except Exception:
             logger.exception("Ошибка в методе subtract")
             raise
 
@@ -58,7 +57,7 @@ class Calculator:
             result = a * b
             logger.debug(f"Результат multiply: {result}")
             return result
-        except Exception as e:
+        except Exception:
             logger.exception("Ошибка в методе multiply")
             raise
 
@@ -75,6 +74,6 @@ class Calculator:
         except ZeroDivisionError:
             logger.exception("Деление на ноль")
             raise
-        except Exception as e:
+        except Exception:
             logger.exception("Ошибка в методе divide")
             raise

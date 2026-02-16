@@ -34,16 +34,12 @@ def get_amount_in_rub(transaction: Dict) -> Optional[float]:
             print("Ошибка: API ключ не найден. Проверьте файл .env")
             return None
 
-        params: dict[str, str | float | int] = {
-            "from": currency,
-            "to": "RUB",
-            "amount": amount
-        }
+        params: dict[str, str | float | int] = {"from": currency, "to": "RUB", "amount": amount}
         response = requests.get(
             "https://api.apilayer.com/exchangerates_data/convert",
             headers={"apikey": api_key},
             params=params,
-            timeout=10
+            timeout=10,
         )
         response.raise_for_status()
         data = response.json()

@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOG_DIR = BASE_DIR / "logs"
 LOG_FILE = LOG_DIR / "utils.log"
@@ -30,7 +29,6 @@ def transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
     В случае ошибок возвращает пустой список, записывая детали в лог.
     """
     logger.info(f"Начало чтения файла: {file_path}")
-
 
     if not os.path.exists(file_path):
         error_msg = f"Файл {os.path.basename(file_path)} не найден"
