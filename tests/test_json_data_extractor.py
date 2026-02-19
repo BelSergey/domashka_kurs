@@ -1,4 +1,5 @@
 import json
+import os.path
 import unittest
 from unittest.mock import mock_open, patch
 
@@ -93,8 +94,9 @@ class TestTransactionDataExtractor(unittest.TestCase):
         """В сообщении об ошибке используется только имя файла, а не полный путь."""
         mock_exists.return_value = False
         mock_basename.return_value = "myfile.json"
-        transaction_data_extractor(r"C:\Users\79045\PycharmProjects\domashka_kurs\mylog.txt")
-        mock_print.assert_called_with("Файл myfile.json не найден!")
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mylog.txt")
+        transaction_data_extractor(file_path)
+        mock_print.assert_called_with("Файл myfile.json не найден")
 
     @patch("src.utils.json_data_extractor.os.path.exists")
     @patch("src.utils.json_data_extractor.os.path.getsize")
@@ -105,7 +107,6 @@ class TestTransactionDataExtractor(unittest.TestCase):
         mock_exists.return_value = True
         mock_getsize.return_value = 50000
         mock_file.return_value.__enter__.return_value.read.return_value = json.dumps(test_data)
-
         result = transaction_data_extractor("large.json")
         self.assertEqual(len(result), 1000)
         self.assertEqual(result[0]["id"], 0)
