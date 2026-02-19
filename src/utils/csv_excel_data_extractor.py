@@ -1,9 +1,8 @@
+import logging
 import os
 from pathlib import Path
-import logging
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional, Hashable
 import pandas as pd
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOG_DIR = BASE_DIR / "logs"
@@ -24,8 +23,8 @@ if not logger.handlers:
     logger.addHandler(file_handler)
 
 
-def data_extractor(file_path: str, separator: str = ";",  sheet_name: str | int = 0) -> Optional[List[Dict[str, Any]]]:
-    """ Читает CSV или Excel файл с транзакциями и возвращает список словарей. """
+def data_extractor(file_path: str, separator: str = ";", sheet_name: str | int = 0) -> Optional[List[Dict[Hashable, Any]]]:
+    """Читает CSV или Excel файл с транзакциями и возвращает список словарей."""
 
     logger.info(f"Начало чтения файла: {file_path}")
 
@@ -41,15 +40,15 @@ def data_extractor(file_path: str, separator: str = ";",  sheet_name: str | int 
     extension = extension.lower()
 
     try:
-        if extension == '.csv':
+        if extension == ".csv":
             df = pd.read_csv(file_path, sep=separator)
-        elif extension in ('.xlsx', '.xls'):
+        elif extension in (".xlsx", ".xls"):
             df = pd.read_excel(file_path, sheet_name=sheet_name)
         else:
             logger.error(f"Неподдерживаемый формат файла: {extension}")
             return []
 
-        records = df.to_dict(orient='records')
+        records = df.to_dict(orient="records")
         logger.info(f"Успешно прочитано {len(records)} записей из файла {file_path}")
         return records
 

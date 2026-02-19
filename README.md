@@ -13,27 +13,6 @@
 
 ## Установка с помощью Poetry:
 
-project/
-├── img.png
-├── pyproject.toml
-├── poetry.lock
-├── README.md
-├── .flake8
-├── .gitignore
-├── src/
-├ ├── __init__.py        
-├ ├── generators.py       
-├ ├── main.py           
-├ ├── masks.py           
-├ ├── processing.py     
-├ └── widget.py      
-├── tests/
-├ ├── __init__.py        
-├ ├── test_generators.py       
-├ ├── test_masks.py           
-├ ├── test_processing.py     
-├ └── test_widget.py
-
 1. Клонируйте репозиторий:
 
 ```
@@ -53,17 +32,22 @@ poetry shell
 ```
 
 # Структура проекта
-
 ![img.png](img.png)
 
 # Описание модулей
 # src\utils
-## json_data_extractor 
+
+## csv_excel_data_extractor.py
 
     Содержит:
-- функцию извлечения данных о транзакциях из json- файла transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
+- функцию извлечения данных о транзакциях из csv, xls, xlsx- файлов data_extractor(file_path: str, separator: str = ";", sheet_name: str | int = 0) -> Optional[List[Dict[Hashable, Any]]]:  
 
-## simple_calculator
+## json_data_extractor.py 
+
+    Содержит:
+- функцию извлечения данных о транзакциях из json- файлов transaction_data_extractor(file_path: str) -> List[Dict[str, Any]]:
+
+## simple_calculator.py
 Содержит:
 - класс Calculator с функциями сложения, вычитания, умножения и деления целых чисел  
 # src/
