@@ -4,11 +4,15 @@ from collections import Counter
 
 
 def filter_by_state(operations: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
-    """ Фильтрует список словарей по значению ключа 'state' . """
+    """ Фильтрует список словарей по значению ключа 'state'.  """
     state_upper = state.upper()
     filtered = []
     for op in operations:
-        if op.get("state", "").upper() == state_upper:
+        val = op.get("state")
+        if val is None:
+            continue
+        str_val = str(val).upper()
+        if str_val == state_upper:
             filtered.append(op)
     return filtered
 

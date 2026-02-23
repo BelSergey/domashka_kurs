@@ -3,19 +3,68 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 from widget import mask_account_card
-from  processing import filter_by_state, sort_by_date, filter_by_description, count_operations_by_categories
+from processing import (
+    filter_by_state,
+    sort_by_date,
+    filter_by_description,
+    count_operations_by_categories,
+)
 from utils.json_data_extractor import transaction_data_extractor as tde
 from utils.csv_excel_data_extractor import data_extractor as de
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def format_output(operation: Dict[str, Any]) -> str:
+    """Форматирует одну операцию для вывода."""
+    date_iso = operation.get('date', '')
+    try:
+        dt = datetime.fromisoformat(date_iso.replace('Z', '+00:00'))
+        date_str = dt.strftime('%d.%m.%Y')
+    except (ValueError, TypeError):
+        date_str = '??.??.????'
+
+    description = operation.get('description', 'Без описания')
+    from_str = mask_account_card(operation.get('from', ''))
+    to_str = mask_account_card(operation.get('to', ''))
+
+    amount_raw = operation.get('amount', '0')
+    try:
+        if isinstance(amount_raw, float) and amount_raw.is_integer():
+            amount = str(int(amount_raw))
+        elif isinstance(amount_raw, str) and amount_raw.endswith('.0'):
+            amount = amount_raw[:-2]
+        else:
+            amount = str(amount_raw)
+    except:
+        amount = str(amount_raw)
+
+    currency = operation.get('currency_code', operation.get('currency_name', '')).upper()
+    currency_map = {'RUB': 'руб.', 'USD': 'USD', 'EUR': 'EUR'}
+    currency = currency_map.get(currency, currency)
+
+    # Формируем вторую строку
+    if from_str and to_str:
+        second_line = f"{from_str} -> {to_str}"
+    elif from_str:
+        second_line = f"{from_str} ->"
+    elif to_str:
+        second_line = to_str
+    else:
+        second_line = ""
+
+    lines = [
+        f"{date_str} {description}",
+        second_line,
+        f"Сумма: {amount} {currency}",
+    ]
+    if not second_line:
+        lines.pop(1)
+    return '\n'.join(lines)
+
+
 def normalize_operation(op: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Приводит операцию к единому плоскому формату:
-    ключи 'amount', 'currency_code', 'currency_name' на верхнем уровне.
-    Если операция уже плоская, возвращается без изменений.
-    """
+    """Приводит операцию к единому плоскому формату (для JSON с вложенной структурой)."""
     if 'amount' in op and ('currency_code' in op or 'currency_name' in op):
         return op
 
@@ -31,41 +80,11 @@ def normalize_operation(op: Dict[str, Any]) -> Dict[str, Any]:
         new_op['currency_code'] = currency_code
         new_op['currency_name'] = currency_name
         return new_op
+
     return op
 
-def format_output(operation: Dict[str, Any]) -> str:
-    """Форматирует одну операцию для вывода."""
-    date_iso = operation.get('date', '')
-    try:
-        dt = datetime.fromisoformat(date_iso.replace('Z', '+00:00'))
-        date_str = dt.strftime('%d.%m.%Y')
-    except (ValueError, TypeError):
-        date_str = '??.??.????'
 
-    description = operation.get('description', 'Без описания')
-
-    from_str = mask_account_card(operation.get('from', ''))
-    to_str = mask_account_card(operation.get('to', ''))
-
-    amount = operation.get('amount', '0')
-    currency = operation.get('currency_code', operation.get('currency_name', '')).upper()
-    if currency == 'RUB':
-        currency = 'руб.'
-    elif currency == 'USD':
-        currency = 'USD'
-    elif currency == 'EUR':
-        currency = 'EUR'
-    lines = [
-        f"{date_str} {description}",
-        f"{from_str} -> {to_str}" if from_str else f"-> {to_str}",
-        f"Сумма: {amount} {currency}"
-    ]
-    return '\n'.join(lines)
-
-
-
-def main():
-
+def main() -> None:
     print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
     print("Выберите необходимый пункт меню:")
     print("1. Получить информацию о транзакциях из JSON-файла")
@@ -74,7 +93,6 @@ def main():
 
     choice = input("Пользователь: ").strip()
 
-    # Загружаем данные в зависимости от выбора
     data = []
     if choice == '1':
         print("Для обработки выбран JSON-файл.")
@@ -82,10 +100,10 @@ def main():
         data = [normalize_operation(op) for op in raw_data]
     elif choice == '2':
         print("Для обработки выбран CSV-файл.")
-        data = de(BASE_DIR / "data/operations.csv")
+        data = de(BASE_DIR / "data/transactions.csv")
     elif choice == '3':
         print("Для обработки выбран XLSX-файл.")
-        data = de(BASE_DIR / "data/operations_excel.xlsx")
+        data = de(BASE_DIR / "data/transactions_excel.xlsx")
     else:
         print("Неверный выбор. Завершение программы.")
         return
@@ -94,39 +112,49 @@ def main():
         print("Не удалось загрузить данные. Программа завершена.")
         return
 
-    # Запрос статуса
-    valid_statuses = {"EXECUTED", "CANCELED", "PENDING"}
+    status_map = {"1": "EXECUTED", "2": "CANCELED", "3": "PENDING"}
     while True:
-        status_input = input("Введите статус, по которому необходимо выполнить фильтрацию.\n"
-                             "Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING\n"
-                             "Пользователь: ").strip()
-        if status_input.upper() in valid_statuses:
+        print("\nВыберите статус операций:")
+        print("1. EXECUTED")
+        print("2. CANCELED")
+        print("3. PENDING")
+        choice_status = input("Пользователь: ").strip()
+        if choice_status in status_map:
+            selected_status = status_map[choice_status]
             break
-        print(f"Статус операции \"{status_input}\" недоступен.")
+        print(f"Вариант {choice_status} недоступен.")
 
-    # Фильтрация по статусу
-    filtered_data = filter_by_state(data, status_input)
-    print(f"Операции отфильтрованы по статусу \"{status_input}\"")
+    filtered_data = filter_by_state(data, selected_status)
+    print(f"Операции отфильтрованы по статусу \"{selected_status}\"")
 
     if not filtered_data:
         print("Не найдено ни одной транзакции с таким статусом.")
         return
-    sort_answer = input("Отсортировать операции по дате? Да/Нет\nПользователь: ").strip().lower()
+
+    sort_answer = input("\nОтсортировать операции по дате? Да/Нет\nПользователь: ").strip().lower()
     if sort_answer in ('да', 'yes', 'y'):
-        order = input("Отсортировать по возрастанию или по убыванию?\nПользователь: ").strip().lower()
-        reverse = order in ('убыванию', 'убывание', 'desc', 'по убыванию')
+        order_map = {"1": False, "2": True}  # False - возрастание, True - убывание
+        while True:
+            print("Выберите порядок сортировки:")
+            print("1. По возрастанию")
+            print("2. По убыванию")
+            order_choice = input("Пользователь: ").strip()
+            if order_choice in order_map:
+                reverse = order_map[order_choice]
+                break
+            print("Неверный ввод. Попробуйте снова.")
         filtered_data = sort_by_date(filtered_data, reverse=reverse)
 
-    rub_answer = input("Выводить только рублевые транзакции? Да/Нет\nПользователь: ").strip().lower()
+    rub_answer = input("\nВыводить только рублевые транзакции? Да/Нет\nПользователь: ").strip().lower()
     if rub_answer in ('да', 'yes', 'y'):
         filtered_data = [op for op in filtered_data if op.get('currency_code') == 'RUB']
 
-    word_answer = input(
-        "Отфильтровать список транзакций по определенному слову в описании? Да/Нет\nПользователь: ").strip().lower()
+    word_answer = input("\nОтфильтровать список транзакций по определенному слову в описании? Да/Нет\nПользователь: ").strip().lower()
     if word_answer in ('да', 'yes', 'y'):
         search_word = input("Введите слово для поиска: ").strip()
         filtered_data = filter_by_description(filtered_data, search_word)
 
+    # Вывод результата
     print("\nРаспечатываю итоговый список транзакций...")
     if not filtered_data:
         print("Не найдено ни одной транзакции, подходящей под ваши условия фильтрации")
