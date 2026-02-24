@@ -8,9 +8,8 @@ def mask_account_card(incoming_data):
     if incoming_data is None:
         return ""
     s = str(incoming_data).strip()
-    if not s or s.lower() == 'nan':
+    if not s or s.lower() == "nan":
         return ""
-
 
     if s.isdigit():
         if len(s) >= 16:

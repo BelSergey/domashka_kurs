@@ -1,10 +1,10 @@
-from typing import Any, Dict, List
 import re
 from collections import Counter
+from typing import Any, Dict, List
 
 
 def filter_by_state(operations: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
-    """ Фильтрует список словарей по значению ключа 'state'.  """
+    """Фильтрует список словарей по значению ключа 'state'."""
     state_upper = state.upper()
     filtered = []
     for op in operations:
@@ -24,30 +24,32 @@ def sort_by_date(operations: List[Dict[str, Any]], reverse: bool = True) -> List
 
     return sorted_operations
 
+
 def filter_by_description(data: List[Dict[str, Any]], search_string: str) -> List[Dict[str, Any]]:
-    """ Фильтрует операции по вхождению строки в поле 'description'. """
+    """Фильтрует операции по вхождению строки в поле 'description'."""
     pattern = re.compile(re.escape(search_string), re.IGNORECASE)
     result = []
     for record in data:
-        description = record.get('description')
+        description = record.get("description")
         if not isinstance(description, str):
-            description = str(description) if description is not None else ''
+            description = str(description) if description is not None else ""
         if pattern.search(description):
             result.append(record)
     return result
 
+
 def count_operations_by_categories(data: List[Dict[str, Any]], categories: List[str]) -> Dict[str, int]:
-    """ Подсчитывает количество операций в каждой категории. """
+    """Подсчитывает количество операций в каждой категории."""
     descriptions_lower = []
     for item in data:
-        if 'description' in item:
-            desc = item['description']
+        if "description" in item:
+            desc = item["description"]
             if not isinstance(desc, str):
 
                 if isinstance(desc, float) and desc.is_integer():
                     desc = str(int(desc))
                 else:
-                    desc = str(desc) if desc is not None else ''
+                    desc = str(desc) if desc is not None else ""
             descriptions_lower.append(desc.lower())
 
     counter_lower = Counter(descriptions_lower)
