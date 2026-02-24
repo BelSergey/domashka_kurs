@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Hashable, List, Optional
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -24,9 +24,7 @@ if not logger.handlers:
     logger.addHandler(file_handler)
 
 
-def data_extractor(
-    file_path: str, separator: str = ";", sheet_name: str | int = 0
-) -> Optional[List[Dict[str, Any]]]:
+def data_extractor(file_path: str, separator: str = ";", sheet_name: str | int = 0) -> Optional[List[Dict[str, Any]]]:
     """Читает CSV или Excel файл с транзакциями и возвращает список словарей."""
 
     logger.info(f"Начало чтения файла: {file_path}")
@@ -53,9 +51,7 @@ def data_extractor(
 
         raw_records = df.to_dict(orient="records")
 
-        records: list[dict[str, Any]] = [
-            {str(k): v for k, v in row.items()} for row in raw_records
-        ]
+        records: list[dict[str, Any]] = [{str(k): v for k, v in row.items()} for row in raw_records]
         logger.info(f"Успешно прочитано {len(records)} записей из файла {file_path}")
         return records
 

@@ -3,18 +3,12 @@ from collections import Counter
 from typing import Any, Dict, List
 
 
-def filter_by_state(operations: List[Dict[str, Any]], state: str = "EXECUTED") -> List[Dict[str, Any]]:
-    """Фильтрует список словарей по значению ключа 'state'."""
-    state_upper = state.upper()
-    filtered = []
-    for op in operations:
-        val = op.get("state")
-        if val is None:
-            continue
-        str_val = str(val).upper()
-        if str_val == state_upper:
-            filtered.append(op)
-    return filtered
+def filter_by_state(
+    operations: list[dict[str, Any]],
+    state: str = "EXECUTED",
+) -> list[dict[str, Any]]:
+    """Фильтрует операции по значению поля state."""
+    return [op for op in operations if op.get("state") == state]
 
 
 def sort_by_date(operations: List[Dict[str, Any]], reverse: bool = True) -> List[Dict[str, Any]]:
