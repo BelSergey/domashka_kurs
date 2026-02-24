@@ -594,3 +594,50 @@ def create_decorated_function() -> Callable[..., Callable[..., Any]]:
             return decorated
 
     return _create
+
+
+@pytest.fixture
+def flat_operation():
+    return {
+        "date": "2023-01-10T10:00:00Z",
+        "description": "Перевод",
+        "from": "Счет 1111",
+        "to": "Карта 2222",
+        "amount": "1000",
+        "currency_code": "RUB",
+        "state": "EXECUTED",
+    }
+
+
+@pytest.fixture
+def flat_usd_operation():
+    return {
+        "date": "2023-01-11T10:00:00Z",
+        "description": "Покупка",
+        "from": "Счет 3333",
+        "to": "Карта 4444",
+        "amount": "10.0",
+        "currency_code": "USD",
+        "state": "EXECUTED",
+    }
+
+
+@pytest.fixture
+def nested_operation():
+    return {
+        "id": 1,
+        "date": "2023-01-01T00:00:00Z",
+        "description": "Оплата",
+        "operationAmount": {
+            "amount": "500",
+            "currency": {"code": "EUR", "name": "euro"},
+        },
+    }
+
+
+@pytest.fixture
+def input_seq(monkeypatch):
+    def _set(values):
+        it = iter(values)
+        monkeypatch.setattr("builtins.input", lambda _: next(it))
+    return _set
