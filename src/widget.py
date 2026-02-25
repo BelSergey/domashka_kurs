@@ -1,27 +1,31 @@
 from datetime import datetime
 
-from masks import get_mask_account, get_mask_card_number
+from src.masks import get_mask_account, get_mask_card_number
 
 
-def mask_account_card(incoming_string: str) -> str:
-    """Функция обрабатывает информацию о картах и счетах"""
-    if not incoming_string:
+def mask_account_card(input_string: str) -> str:
+    """Маскирует номер карты или счета в строке."""
+    if not input_string:
         return ""
 
-    parts = incoming_string.split(" ")
+    parts = input_string.strip().split()
     if len(parts) < 2:
         return ""
 
-    card_name_parts = parts[:-1]
     number = parts[-1]
+    name = " ".join(parts[:-1])
 
-    if parts[0] in ["Visa", "Maestro", "MasterCard"]:
-        card_name = " ".join(card_name_parts)
-        return f"{card_name} {get_mask_card_number(number)}"
-    elif parts[0] == "Счет":
-        return f"{parts[0]} {get_mask_account(number)}"
-
-    return ""
+    try:
+        if name.startswith(("Visa", "Maestro", "MasterCard")):
+            masked = get_mask_card_number(number)
+            return f"{name} {masked}"
+        elif name == "Счет":
+            masked = get_mask_account(number)
+            return f"{name} {masked}"
+        else:
+            return ""
+    except Exception:
+        return ""
 
 
 def get_date(date_string: str) -> str:
