@@ -1,6 +1,4 @@
-import os
 import pandas as pd
-import pytest
 
 from src.utils.csv_excel_data_extractor import data_extractor
 

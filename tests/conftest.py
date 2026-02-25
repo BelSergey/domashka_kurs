@@ -640,4 +640,5 @@ def input_seq(monkeypatch):
     def _set(values):
         it = iter(values)
         monkeypatch.setattr("builtins.input", lambda _: next(it))
+
     return _set
